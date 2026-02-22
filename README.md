@@ -1,5 +1,5 @@
 # aire-reliability-portfolio
-##A Note
+## A Note
 I am building this while preparing for a senior AI reliability engineering role. Six projects. Each one maps to a real responsibility on the job — keeping large-scale AI systems alive, observable, and worth the money they cost to run.
 Everything would (hopefully) run in GitHub Codespaces. No local setup. Open it, spin it up, break it, fix it.
 
