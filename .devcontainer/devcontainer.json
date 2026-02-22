@@ -7,7 +7,7 @@
     },
     "ghcr.io/devcontainers/features/node:1": {}
   },
-  "postCreateCommand": "pip install fastapi uvicorn prometheus-client httpx && docker compose version",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y git-lfs && git lfs install && pip install fastapi uvicorn prometheus-client httpx && docker compose version",
   "customizations": {
     "vscode": {
       "extensions": [
