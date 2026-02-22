@@ -1,0 +1,21 @@
+{
+  "name": "AIRE Reliability Portfolio",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+  "postCreateCommand": "pip install fastapi uvicorn prometheus-client httpx && docker compose version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  "forwardPorts": [8000, 9090, 3000]
+}

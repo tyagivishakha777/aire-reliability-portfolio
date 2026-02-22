@@ -1,0 +1,31 @@
+# -- Recording Rules --
+# Pre-computed SLIs. Dashboards stay fast. Alert rules stay clean.
+
+groups:
+  - name: sli-recording-rules
+    interval: 30s
+    rules:
+
+      # Availability: what fraction of requests didn't 5xx.
+      - record: sli:availability:ratio_rate5m #this creates the view for one set of our metrics which Prometheus wont have to calculate it on the go
+        expr: |
+          sum(rate(http_requests_total{status!~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total[5m]))
+
+      # Latency: what fraction finished under 200ms.
+      - record: sli:latency_under_200ms:ratio_rate5m
+        expr: |
+          sum(rate(http_request_duration_seconds_bucket{le="0.2"}[5m]))
+          /
+          sum(rate(http_request_duration_seconds_count[5m]))
+
+      # Error budget remaining.
+      # SLO = 99.5%. Budget = 0.5% of requests can fail.
+      # Returns 1.0 when fully intact, 0.0 when spent, negative when breached.
+      - record: slo:availability:error_budget_remaining
+        expr: |
+          1 - (
+            (1 - sli:availability:ratio_rate5m)
+            / (1 - 0.995)
+          )

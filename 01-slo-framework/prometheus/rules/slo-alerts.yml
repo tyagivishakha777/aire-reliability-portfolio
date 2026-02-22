@@ -1,0 +1,60 @@
+# -- Burn Rate Alerts --
+# Two windows per alert. Short one catches it fast.
+# Long one confirms it's real, not a blip.
+# Both must fire. Otherwise you're waking someone up for nothing.
+
+groups:
+  - name: slo-burn-rate-alerts
+    rules:
+
+      # CRITICAL — 14.4x burn rate.
+      # At this pace the 30-day budget is gone in 2 days. Page immediately.
+      - alert: HighErrorBurnRate_Critical
+        expr: |
+          (
+            1 - (
+              sum(rate(http_requests_total{status!~"5.."}[5m]))
+              / sum(rate(http_requests_total[5m]))
+            )
+          ) > (14.4 * (1 - 0.995))
+          and
+          (
+            1 - (
+              sum(rate(http_requests_total{status!~"5.."}[1h]))
+              / sum(rate(http_requests_total[1h]))
+            )
+          ) > (14.4 * (1 - 0.995))
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Availability burn rate is critical (14.4x)"
+          description: >
+            5m and 1h error rates both exceed 14.4x sustainable burn.
+            Budget gone in ~2 days at this pace. Investigate now.
+
+      # WARNING — 3x burn rate.
+      # Budget exhausts in 10 days. Not an emergency. But not fine either.
+      - alert: HighErrorBurnRate_Warning
+        expr: |
+          (
+            1 - (
+              sum(rate(http_requests_total{status!~"5.."}[30m]))
+              / sum(rate(http_requests_total[30m]))
+            )
+          ) > (3 * (1 - 0.995))
+          and
+          (
+            1 - (
+              sum(rate(http_requests_total{status!~"5.."}[6h]))
+              / sum(rate(http_requests_total[6h]))
+            )
+          ) > (3 * (1 - 0.995))
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Availability burn rate elevated (3x)"
+          description: >
+            30m and 6h error rates both exceed 3x sustainable burn.
+            Budget gone in ~10 days. Investigate during business hours.
